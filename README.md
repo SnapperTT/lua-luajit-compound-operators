@@ -32,7 +32,7 @@ Lua continue from zewt's continue branch [https://github.com/zewt/lua/compare/ma
 ## To Be Done
 Probably won't be done unless someone submits a PR
 Support binops: `&,|,^,~`
-* Luajit binops built upon [[https://github.com/LuaJIT/LuaJIT/pull/312.patch]]
+* Luajit binops built upon [https://github.com/LuaJIT/LuaJIT/pull/312.patch]
 * Lua5.2 binops from powerpatch [http://lua-users.org/wiki/LuaPowerPatches] (contorl-f: "Bitwise operators, integer division and != (5.1.4)")
 * Support compound binops `&=, |=`. Look at `lua52.patch` and `luajit210.patch` for hints as to how to hook
 * Support multiple assign (eg `a,b,c += 1,2,3`). Patched lua supports this, the bit stopping this is trying to match
