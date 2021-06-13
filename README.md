@@ -9,7 +9,7 @@ Lua5.2.4 and Luajit 2.1.0 are both supported so that you can use Lua when debugg
 This is distributed as a patch so that you can apply it to future versions (rather than this becoming yet another unmaintained lua/luajit fork)
 
 ### How to Use
-Download relevent sources and then use `patch`
+Download relevent sources and then use `patch` and then build as usual.
 
 Alternatively use `fetch_and_apply_lua*.sh` to automatically download and patch
 
@@ -21,10 +21,12 @@ Edit files `makediff_lua*.sh` to make a new `lua*.patch`. Set A to the unmodifie
 * Increment `++` should be an isolated statement (no `t[a++]`)
 
 ### Implementation Credits, Etc
-Luajit continue from [[https://github.com/zewt/LuaJIT/commit/c0e38bacba15d0259c3b77]]
-Luajit compound operaters based on [[https://github.com/mingodad/ljsjit]]
+Luajit continue from [https://github.com/zewt/LuaJIT/commit/c0e38bacba15d0259c3b77]
+
+Luajit compound operaters based on [https://github.com/mingodad/ljsjit]
 
 Lua compound operators SvenOlsen's powerpatch [http://lua-users.org/wiki/LuaPowerPatches] (control-f: "Compound Assignment Operators (5.2)")
+
 Lua continue from zewt's continue branch [https://github.com/zewt/lua/compare/master...zewt:continue?expand=1]
 
 ## To Be Done
