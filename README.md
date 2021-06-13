@@ -17,8 +17,8 @@ Alternatively use `fetch_and_apply_lua*.sh` to automatically download and patch
 Edit files `makediff_lua*.sh` to make a new `lua*.patch`. Set A to the unmodified source directory and B to the modified source and run the script.
 
 ### Hairy Bits
-* Tupple assignements are not supported (no `a,b,c+=1337`)
-* Increment `++` should be an isolated statement (no `t[a++]`)
+* Tupple assignements are not supported (no `a,b,c+=1337`). They do work in patched PUC lua, but not patched luajit
+* Increment `a++` is a post-increment and should be an isolated statement (no `t[a++]`)
 
 ### Implementation Credits, Etc
 Luajit continue from [https://github.com/zewt/LuaJIT/commit/c0e38bacba15d0259c3b77]
