@@ -86,7 +86,7 @@ diff -rup lj_lex.h lj_lex.h
  #define TKENUM1(name)		TK_##name,
 diff -rup lj_parse.c lj_parse.c
 --- lj_parse.c	2017-05-02 05:03:01.000000000 +1000
-+++ lj_parse.c	2021-06-13 15:54:11.609885153 +1000
++++ lj_parse.c	2021-06-27 01:38:11.206258892 +1000
 @@ -28,6 +28,8 @@
  #include "lj_vm.h"
  #include "lj_vmevent.h"
@@ -248,7 +248,15 @@ diff -rup lj_parse.c lj_parse.c
  /* Parse simple expression. */
  static void expr_simple(LexState *ls, ExpDesc *v)
  {
-@@ -2183,6 +2255,47 @@ static void assign_adjust(LexState *ls,
+@@ -2133,6 +2205,7 @@ static BCPos expr_cond(LexState *ls)
+ typedef struct LHSVarList {
+   ExpDesc v;			/* LHS variable. */
+   struct LHSVarList *prev;	/* Link to previous LHS variable. */
++  struct LHSVarList *next;	/* Link to next LHS variable. */
+ } LHSVarList;
+ 
+ /* Eliminate write-after-read hazards for local variable assignment. */
+@@ -2183,6 +2256,47 @@ static void assign_adjust(LexState *ls,
      ls->fs->freereg -= nexps - nvars;  /* Drop leftover regs. */
  }
  
@@ -296,7 +304,7 @@ diff -rup lj_parse.c lj_parse.c
  /* Recursively parse assignment statement. */
  static void parse_assignment(LexState *ls, LHSVarList *lh, BCReg nvars)
  {
-@@ -2191,6 +2304,7 @@ static void parse_assignment(LexState *l
+@@ -2191,6 +2305,7 @@ static void parse_assignment(LexState *l
    if (lex_opt(ls, ',')) {  /* Collect LHS list and recurse upwards. */
      LHSVarList vl;
      vl.prev = lh;
@@ -304,7 +312,7 @@ diff -rup lj_parse.c lj_parse.c
      expr_primary(ls, &vl.v);
      if (vl.v.k == VLOCAL)
        assign_hazard(ls, lh, &vl.v);
-@@ -2228,8 +2342,14 @@ static void parse_call_assign(LexState *
+@@ -2228,8 +2343,14 @@ static void parse_call_assign(LexState *
    expr_primary(ls, &vl.v);
    if (vl.v.k == VCALL) {  /* Function call statement. */
      setbc_b(bcptr(fs, &vl.v), 1);  /* No results. */
@@ -320,7 +328,7 @@ diff -rup lj_parse.c lj_parse.c
      parse_assignment(ls, &vl, 1);
    }
  }
-@@ -2341,6 +2461,13 @@ static void parse_return(LexState *ls)
+@@ -2341,6 +2462,13 @@ static void parse_return(LexState *ls)
  }
  
  /* Parse 'break' statement. */
@@ -334,7 +342,7 @@ diff -rup lj_parse.c lj_parse.c
  static void parse_break(LexState *ls)
  {
    ls->fs->bl->flags |= FSCOPE_BREAK;
-@@ -2418,6 +2545,7 @@ static void parse_while(LexState *ls, BC
+@@ -2418,6 +2546,7 @@ static void parse_while(LexState *ls, BC
    parse_block(ls);
    jmp_patch(fs, bcemit_jmp(fs), start);
    lex_match(ls, TK_end, TK_while, line);
@@ -342,7 +350,7 @@ diff -rup lj_parse.c lj_parse.c
    fscope_end(fs);
    jmp_tohere(fs, condexit);
    jmp_patchins(fs, loop, fs->pc);
-@@ -2428,7 +2556,7 @@ static void parse_repeat(LexState *ls, B
+@@ -2428,7 +2557,7 @@ static void parse_repeat(LexState *ls, B
  {
    FuncState *fs = ls->fs;
    BCPos loop = fs->lasttarget = fs->pc;
@@ -351,7 +359,7 @@ diff -rup lj_parse.c lj_parse.c
    FuncScope bl1, bl2;
    fscope_begin(fs, &bl1, FSCOPE_LOOP);  /* Breakable loop scope. */
    fscope_begin(fs, &bl2, 0);  /* Inner scope. */
-@@ -2436,6 +2564,7 @@ static void parse_repeat(LexState *ls, B
+@@ -2436,6 +2565,7 @@ static void parse_repeat(LexState *ls, B
    bcemit_AD(fs, BC_LOOP, fs->nactvar, 0);
    parse_chunk(ls);
    lex_match(ls, TK_until, TK_repeat, line);
@@ -359,7 +367,7 @@ diff -rup lj_parse.c lj_parse.c
    condexit = expr_cond(ls);  /* Parse condition (still inside inner scope). */
    if (!(bl2.flags & FSCOPE_UPVAL)) {  /* No upvalues? Just end inner scope. */
      fscope_end(fs);
-@@ -2447,6 +2576,7 @@ static void parse_repeat(LexState *ls, B
+@@ -2447,6 +2577,7 @@ static void parse_repeat(LexState *ls, B
    }
    jmp_patch(fs, condexit, loop);  /* Jump backwards if !cond. */
    jmp_patchins(fs, loop, fs->pc);
@@ -367,7 +375,7 @@ diff -rup lj_parse.c lj_parse.c
    fscope_end(fs);  /* End loop scope. */
  }
  
-@@ -2486,6 +2616,7 @@ static void parse_for_num(LexState *ls,
+@@ -2486,6 +2617,7 @@ static void parse_for_num(LexState *ls,
    fs->bcbase[loopend].line = line;  /* Fix line for control ins. */
    jmp_patchins(fs, loopend, loop+1);
    jmp_patchins(fs, loop, fs->pc);
@@ -375,7 +383,7 @@ diff -rup lj_parse.c lj_parse.c
  }
  
  /* Try to predict whether the iterator is next() and specialize the bytecode.
-@@ -2528,7 +2659,7 @@ static void parse_for_iter(LexState *ls,
+@@ -2528,7 +2660,7 @@ static void parse_for_iter(LexState *ls,
    BCReg nvars = 0;
    BCLine line;
    BCReg base = fs->freereg + 3;
@@ -384,7 +392,7 @@ diff -rup lj_parse.c lj_parse.c
    FuncScope bl;
    int isnext;
    /* Hidden control variables. */
-@@ -2555,11 +2686,12 @@ static void parse_for_iter(LexState *ls,
+@@ -2555,11 +2687,12 @@ static void parse_for_iter(LexState *ls,
    fscope_end(fs);
    /* Perform loop inversion. Loop control instructions are at the end. */
    jmp_patchins(fs, loop, fs->pc);
@@ -398,7 +406,7 @@ diff -rup lj_parse.c lj_parse.c
  }
  
  /* Parse 'for' statement. */
-@@ -2573,8 +2705,10 @@ static void parse_for(LexState *ls, BCLi
+@@ -2573,8 +2706,10 @@ static void parse_for(LexState *ls, BCLi
    varname = lex_str(ls);  /* Get first variable name. */
    if (ls->tok == '=')
      parse_for_num(ls, varname, line);
@@ -410,7 +418,7 @@ diff -rup lj_parse.c lj_parse.c
    else
      err_syntax(ls, LJ_ERR_XFOR);
    lex_match(ls, TK_end, TK_for, line);
-@@ -2650,6 +2784,10 @@ static int parse_stmt(LexState *ls)
+@@ -2650,6 +2785,10 @@ static int parse_stmt(LexState *ls)
    case TK_return:
      parse_return(ls);
      return 1;  /* Must be last. */
