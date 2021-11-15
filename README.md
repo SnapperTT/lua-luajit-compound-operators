@@ -4,6 +4,8 @@ Adds the following operators to `lua5.2.4` and `luajit 2.1.0-beta3` (latest rele
 * Increment: `++`
 * Continue keyword `continue`.
 
+Metamethods "just work", eg `a+=7` will invoke `__add(a, 7)` and assign result to `a`.
+
 Lua5.2.4 and Luajit 2.1.0 are both supported so that you can use Lua when debugging and LuaJit on release 
 
 This is distributed as a patch so that you can apply it to future versions (rather than this becoming yet another unmaintained lua/luajit fork)
@@ -18,7 +20,8 @@ Edit files `makediff_lua*.sh` to make a new `lua*.patch`. Set A to the unmodifie
 
 ### Hairy Bits
 * Tupple assignements are not supported (no `a,b,c+=1337`). They do work in patched PUC lua, but not patched luajit
-* Increment `a++` is a post-increment and should be an isolated statement (no `t[a++]`)
+* Increment `a++;` is a post-increment and should be an isolated statement (no `t[a++]`, terminate with `;`)
+* There is no `a--;`, instead use `a-=1;`
 
 ### Implementation Credits, Etc
 Luajit continue from [https://github.com/zewt/LuaJIT/commit/c0e38bacba15d0259c3b77]
@@ -31,6 +34,7 @@ Lua continue from zewt's continue branch [https://github.com/zewt/lua/compare/ma
 
 ## To Be Done
 Probably won't be done unless someone submits a PR
+
 Support binops: `&,|,^,~`
 * Luajit binops built upon [https://github.com/LuaJIT/LuaJIT/pull/312.patch]
 * Lua5.2 binops from powerpatch [http://lua-users.org/wiki/LuaPowerPatches] (contorl-f: "Bitwise operators, integer division and != (5.1.4)")
