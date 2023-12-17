@@ -31,8 +31,8 @@ LATEST=$(fetch_git_release "https://github.com/LuaJIT/LuaJIT")
 TARFILE=${LATEST##*/}
 DIR1=${TARFILE%.*}
 DIR2=${DIR1%.*}
-mkdir -p $DIR1
-cd $DIR1
+mkdir -p $DIR2
+cd $DIR2
 echo "Downloading: $LATEST"
 wget https://github.com/$LATEST
 tar -xvf $TARFILE --strip 1
