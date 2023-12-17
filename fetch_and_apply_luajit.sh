@@ -1,7 +1,3 @@
-mkdir luajit210
-cd luajit210
-rm -rf *
-
 fetch_git_release() {
         local URL_RAW=$(curl -s $1/releases | grep -m 1 "tar.gz")
         local URL1=$(echo $URL_RAW | cut -d \" -f2)
@@ -32,9 +28,13 @@ fetch_git_release() {
 
 
 LATEST=$(fetch_git_release "https://github.com/LuaJIT/LuaJIT")
+TARFILE=${LATEST##*/}
+DIR1=${TARFILE%.*}
+DIR2=${DIR1%.*}
+mkdir -p $DIR1
+cd $DIR1
 echo "Downloading: $LATEST"
 wget https://github.com/$LATEST
-TARFILE=${LATEST##*/}
 tar -xvf $TARFILE --strip 1
 cd src/
 patch <../../luajit210.patch
