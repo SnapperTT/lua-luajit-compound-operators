@@ -37,6 +37,6 @@ echo "Downloading: $LATEST"
 wget https://github.com/$LATEST
 tar -xvf $TARFILE --strip 1
 cd src/
-patch <../../luajit210.patch
+patch <../../luajit.patch
 echo -e "######## LuaJit Patched #########\n\n"
 
