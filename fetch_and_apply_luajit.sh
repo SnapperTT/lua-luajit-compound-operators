@@ -38,5 +38,9 @@ wget https://github.com/$LATEST
 tar -xvf $TARFILE --strip 1
 cd src/
 patch <../../luajit.patch
+# Create symlink to src
+cd ..
+rm -f ../link_to_luajit
+ln -s `pwd` ../link_to_luajit
 echo -e "######## LuaJit Patched #########\n\n"
 

@@ -1,4 +1,4 @@
-mkdir luajit210
+mkdir -p luajit210
 cd luajit210
 rm -rf *
 
@@ -10,5 +10,9 @@ TARFILE=${LATEST##*/}
 tar -xvf $TARFILE --strip 1
 cd src/
 patch <../../luajit210.patch
+# Create symlink to src
+cd ..
+rm -f ../link_to_luajit210
+ln -s `pwd` ../link_to_luajit210
 echo -e "######## LuaJit Patched #########\n\n"
 
