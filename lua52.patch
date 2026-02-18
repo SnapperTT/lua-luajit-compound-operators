@@ -24,7 +24,7 @@ diff -rup llex.h llex.h
    TK_RETURN, TK_THEN, TK_TRUE, TK_UNTIL, TK_WHILE,
 diff -rup lparser.c lparser.c
 --- lparser.c	2013-04-13 04:48:47.000000000 +1000
-+++ lparser.c	2021-06-13 14:44:32.661658408 +1000
++++ lparser.c	2024-10-20 14:44:32.661658408 +1000
 @@ -457,6 +457,15 @@ static void breaklabel (LexState *ls) {
  }
  
@@ -185,7 +185,7 @@ diff -rup lparser.c lparser.c
      int nexps;
 +    switch(ls->t.token) {
 +      /* hook for compound_assignment */
-+      case '+': case '-': case '*': case '/': case TK_CONCAT:
++      case '+': case '-': case '*': case '/': case '%': case TK_CONCAT:
 +        return compound_assignment(ls,lh,nvars);
 +    }
      checknext(ls, '=');
